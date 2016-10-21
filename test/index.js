@@ -58,12 +58,31 @@ describe("News API", function() {
 
   });
 
+  describe ("Subscription reset endpoint", function() {
+
+  	it("removes all user subscriptions", function() {
+  		request.post({url: baseUrl + "/reset"}, function(err, res, body) {
+  			expect(res.statusCode).to.equal(200);
+  		});
+  	});
+
+  });
+
   describe("User subscription endpoint", function() {
 
     it("subscribes a user to provided categories", function() {
     	request.post({url: baseUrl + "/subscribe", body: {categories: ["sports", "news"]}}, function(err, res, body) {
         expect(res.statusCode).to.equal(200);
       });
+      request.post({url: baseUrl + "/reset"});
+    });
+
+    it("ignores valid provided categories that the user is already subscribed to", function() {
+    	request.post({url: baseUrl + "/subscribe", body: {categories: ["sports", "news"]}});
+    	request.post({url: baseUrl + "/subscribe", body: {categories: ["sports", "news"]}}, function(err, res, body) {
+        expect(res.statusCode).to.equal(200);
+      });
+      request.post({url: baseUrl + "/reset"});
     });
 
     it("fails without provided categories", function() {
@@ -74,7 +93,30 @@ describe("News API", function() {
 
     it("fails with invalid provided categories", function() {
     	request.post({url: baseUrl + "/subscribe", body: {categories: ["invalid", "categories"]}}, function(err, res, body) {
+        expect(res.statusCode).to.equal(400);
+      });
+    });
+
+  });
+
+  describe("User unsubscription endpoint", function() {
+
+    it("unsubscribes a user from provided categories", function() {
+    	request.post({url: baseUrl + "/subscribe", body: {categories: ["sports", "news"]}});
+    	request.post({url: baseUrl + "/unsubscribe", body: {categories: ["sports", "news"]}}, function(err, res, body) {
         expect(res.statusCode).to.equal(200);
+      });
+    });
+
+    it("ignores valid provided categories that the user is already unsubscribed from", function() {
+    	request.post({url: baseUrl + "/unsubscribe", body: {categories: ["sports", "news"]}}, function(err, res, body) {
+        expect(res.statusCode).to.equal(200);
+      });
+    });
+
+    it("fails with invalid provided categories", function() {
+    	request.post({url: baseUrl + "/unsubscribe", body: {categories: ["invalid", "categories"]}}, function(err, res, body) {
+        expect(res.statusCode).to.equal(400);
       });
     });
 
