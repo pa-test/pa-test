@@ -33,7 +33,18 @@ describe("News API", function() {
 			});
     });
 
-    it("fails with no article", function() {
+    it("fails with an invalid date format", function() {
+			fs.readFile('./test/sample.json', 'utf8', function(err, data) {
+			  if (err) throw err;
+			  article = JSON.parse(data);
+			  article.publishDate = "Friday 21st October 2016";
+			  request.post({url: baseUrl + "/upload", body: article, json: true}, function(err, res, body) {
+	        expect(res.statusCode).to.equal(200);
+	      });
+			});
+    });
+
+    it("fails without an article", function() {
     	request(baseUrl + "/upload", function(err, res, body) {
         expect(res.statusCode).to.equal(400);
       });
@@ -49,8 +60,20 @@ describe("News API", function() {
 
   describe("User subscription endpoint", function() {
 
-    it("returns status 200", function() {
-    	request(baseUrl + "/subscribe", function(err, res, body) {
+    it("subscribes a user to provided categories", function() {
+    	request.post({url: baseUrl + "/subscribe", body: {categories: ["sports", "news"]}}, function(err, res, body) {
+        expect(res.statusCode).to.equal(200);
+      });
+    });
+
+    it("fails without provided categories", function() {
+    	request.post(url: baseUrl + "/subscribe", function(err, res, body) {
+        expect(res.statusCode).to.equal(400);
+      });
+    });
+
+    it("fails with invalid provided categories", function() {
+    	request.post({url: baseUrl + "/subscribe", body: {categories: ["invalid", "categories"]}}, function(err, res, body) {
         expect(res.statusCode).to.equal(200);
       });
     });
