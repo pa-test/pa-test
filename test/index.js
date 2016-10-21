@@ -6,7 +6,7 @@ var expect = require("chai").expect;
 var fs = require('fs');
 
 var newsApi = require("../app/index.js");
-var baseUrl = "http://localhost:8080";
+var baseUrl = "http://localhost:" + newsApi.server.address().port;
 
 describe("News API", function() {
 
