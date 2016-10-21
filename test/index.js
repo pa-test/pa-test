@@ -86,7 +86,7 @@ describe("News API", function() {
     });
 
     it("fails without provided categories", function() {
-    	request.post(url: baseUrl + "/subscribe", function(err, res, body) {
+    	request.post({url: baseUrl + "/subscribe"}, function(err, res, body) {
         expect(res.statusCode).to.equal(400);
       });
     });
