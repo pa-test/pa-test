@@ -23,7 +23,7 @@ var Article = mongoose.model('Article', ArticleSchema);
 
 // Set up REST API endpoints
 app.post("/subscribe", function(req, res) {
-  res.sendStatus(200);
+  res.sendStatus(501);
 });
 
 app.post("/upload", function(req, res) {
@@ -40,7 +40,7 @@ app.post("/upload", function(req, res) {
 			  }
 			});
   	} else {
-  		console.log(invalidFormat.errors);
+  		// console.log(invalidFormat.errors);
   		res.sendStatus(400);
   	}
   } else {
