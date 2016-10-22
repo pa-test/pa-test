@@ -47,6 +47,18 @@ describe("News API", function() {
 			});
     });
 
+    it("fails with invalid provided categories", function(done) {
+      fs.readFile('./test/sample.json', 'utf8', function(err, data) {
+        if (err) throw err;
+        article = JSON.parse(data);
+        article.categories = ["invalid", "categories"];
+        request.post({url: baseUrl + "/upload", body: article, json: true}, function(err, res, body) {
+          expect(res.statusCode).to.equal(400);
+          done();
+        });
+      });
+    });
+
     it("fails without an article", function(done) {
     	request.post({url: baseUrl + "/upload"}, function(err, res, body) {
         expect(res.statusCode).to.equal(400);
@@ -54,7 +66,7 @@ describe("News API", function() {
       });
     });
 
-    it("fails with invalid article format", function(done) {
+    it("fails with invalid article format (e.g. missing metadata)", function(done) {
     	request.post({url: baseUrl + "/upload", body: {invalid: 'article'}, json: true}, function(err, res, body) {
         expect(res.statusCode).to.equal(400);
         done();
