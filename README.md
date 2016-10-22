@@ -1,5 +1,3 @@
 # Press Association technical test
 
-Development branch build status
-
-![Build status](https://circleci.com/gh/stuart-xyz/pa-test.svg?style=shield&circle-token=:circle-token)
+[![CircleCI](https://circleci.com/gh/stuart-xyz/pa-test/tree/develop.svg?style=shield&circle-token=26dd2415adee2f563094d2c989386cf184319c53)](https://circleci.com/gh/stuart-xyz/pa-test/tree/develop)&nbsp;&nbsp;&nbsp;&nbsp;(develop branch)
