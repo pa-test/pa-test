@@ -103,31 +103,31 @@ describe("News API", function() {
   describe("user subscription endpoint", function() {
 
     it("subscribes a user to provided categories", function(done) {
-    	request.post({url: baseUrl + "/subscribe", body: {categories: ["sports", "news"]}, json: true}, function(err, res, body) {
+    	request.post({url: baseUrl + "/subscribe", body: {email: "johnsmith@gmail.com", categories: ["sports", "world"]}, json: true}, function(err, res, body) {
         expect(res.statusCode).to.equal(200);
+        request.post({url: baseUrl + "/reset"});
         done();
       });
-      request.post({url: baseUrl + "/reset"});
     });
 
     it("ignores valid provided categories that the user is already subscribed to", function(done) {
-    	request.post({url: baseUrl + "/subscribe", body: {categories: ["sports", "news"]}, json: true}, function(){});
-    	request.post({url: baseUrl + "/subscribe", body: {categories: ["sports", "news"]}, json: true}, function(err, res, body) {
+    	request.post({url: baseUrl + "/subscribe", body: {email: "johnsmith@gmail.com", categories: ["sports", "world"]}, json: true}, function(){});
+    	request.post({url: baseUrl + "/subscribe", body: {email: "johnsmith@gmail.com", categories: ["sports", "world"]}, json: true}, function(err, res, body) {
         expect(res.statusCode).to.equal(200);
+        request.post({url: baseUrl + "/reset"});
         done();
       });
-      request.post({url: baseUrl + "/reset"});
     });
 
     it("fails without provided categories", function(done) {
-    	request.post({url: baseUrl + "/subscribe"}, function(err, res, body) {
+    	request.post({url: baseUrl + "/subscribe", body: {email: "johnsmith@gmail.com"}}, function(err, res, body) {
         expect(res.statusCode).to.equal(400);
         done();
       });
     });
 
     it("fails with invalid provided categories", function(done) {
-    	request.post({url: baseUrl + "/subscribe", body: {categories: ["invalid", "categories"]}, json: true}, function(err, res, body) {
+    	request.post({url: baseUrl + "/subscribe", body: {email: "johnsmith@gmail.com", categories: ["invalid", "categories"]}, json: true}, function(err, res, body) {
         expect(res.statusCode).to.equal(400);
         done();
       });
@@ -138,22 +138,22 @@ describe("News API", function() {
   describe("user unsubscription endpoint", function() {
 
     it("unsubscribes a user from provided categories", function(done) {
-    	request.post({url: baseUrl + "/subscribe", body: {categories: ["sports", "news"]}, json: true}, function(){});
-    	request.post({url: baseUrl + "/unsubscribe", body: {categories: ["sports", "news"]}, json: true}, function(err, res, body) {
+    	request.post({url: baseUrl + "/subscribe", body: {email: "johnsmith@gmail.com", categories: ["sports", "world"]}, json: true}, function(){});
+    	request.post({url: baseUrl + "/unsubscribe", body: {email: "johnsmith@gmail.com", categories: ["sports", "world"]}, json: true}, function(err, res, body) {
         expect(res.statusCode).to.equal(200);
         done();
       });
     });
 
     it("ignores valid provided categories that the user is already unsubscribed from", function(done) {
-    	request.post({url: baseUrl + "/unsubscribe", body: {categories: ["sports", "news"]}, json: true}, function(err, res, body) {
+    	request.post({url: baseUrl + "/unsubscribe", body: {email: "johnsmith@gmail.com", categories: ["sports", "world"]}, json: true}, function(err, res, body) {
         expect(res.statusCode).to.equal(200);
         done();
       });
     });
 
     it("fails with invalid provided categories", function(done) {
-    	request.post({url: baseUrl + "/unsubscribe", body: {categories: ["invalid", "categories"]}, json: true}, function(err, res, body) {
+    	request.post({url: baseUrl + "/unsubscribe", body: {email: "johnsmith@gmail.com", categories: ["invalid", "categories"]}, json: true}, function(err, res, body) {
         expect(res.statusCode).to.equal(400);
         done();
       });

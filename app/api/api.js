@@ -28,7 +28,6 @@ app.post("/upload", function(req, res) {
         }
       });
     } else {
-      // console.log(invalidFormat.errors);
       res.sendStatus(400);
     }
   } else {
@@ -37,7 +36,24 @@ app.post("/upload", function(req, res) {
 });
 
 app.post("/subscribe", function(req, res) {
-  res.sendStatus(501);
+  if (req.body) {
+    var user = new User(req.body);
+    var invalidFormat = user.validateSync();
+    if (!invalidFormat) {
+      user.save(function(err) {
+        if (err) {
+          console.log(err);
+          res.sendStatus(400);
+        } else {
+          res.sendStatus(200);
+        }
+      });
+    } else {
+      res.sendStatus(400);
+    }
+  } else {
+    res.sendStatus(400);
+  }
 });
 
 app.post("/unsubscribe", function(req, res) {
