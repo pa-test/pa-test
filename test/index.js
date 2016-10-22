@@ -5,7 +5,7 @@ var request = require('request');
 var expect = require("chai").expect;
 var fs = require('fs');
 
-var newsApi = require("../app/index.js");
+var newsApi = require("../app/api/api.js");
 var baseUrl = "http://localhost:" + newsApi.server.address().port;
 
 describe("News API", function() {
@@ -33,6 +33,20 @@ describe("News API", function() {
 	        done();
 	      });
 			});
+    });
+
+    it("stores an article with badly formatted category names", function(done) {
+      fs.readFile('./test/sample.json', 'utf8', function(err, data) {
+        if (err) throw err;
+        article = JSON.parse(data);
+        for (var i = 0; i < article.categories.length; i++) {
+          article.categories[i] = "  " + article.categories[i].toUpperCase() + "  ";
+        }
+        request.post({url: baseUrl + "/upload", body: article, json: true}, function(err, res, body) {
+          expect(res.statusCode).to.equal(200);
+          done();
+        });
+      });
     });
 
     it("fails with an invalid date format", function(done) {
@@ -66,7 +80,7 @@ describe("News API", function() {
       });
     });
 
-    it("fails with invalid article format (e.g. missing metadata)", function(done) {
+    it("fails with invalid article format (includes missing metadata)", function(done) {
     	request.post({url: baseUrl + "/upload", body: {invalid: 'article'}, json: true}, function(err, res, body) {
         expect(res.statusCode).to.equal(400);
         done();

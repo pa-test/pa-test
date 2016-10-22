@@ -2,7 +2,7 @@
   "name": "pa-test",
   "version": "1.0.0",
   "description": "Press Association technical test",
-  "main": "./app/index.js",
+  "main": "./app/api/api.js",
   "scripts": {
     "test": "./node_modules/.bin/mocha --reporter spec"
   },
