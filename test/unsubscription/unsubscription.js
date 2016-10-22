@@ -15,25 +15,103 @@ var baseUrl = "http://localhost:" + newsApi.server.address().port;
 exports.tests = describe("user unsubscription endpoint", function() {
 
   it("unsubscribes a user from provided categories", function(done) {
-      request.post({url: baseUrl + "/subscribe", body: {email: "johnsmith@gmail.com", categories: ["sports", "world"]}, json: true}, function(){});
-      request.post({url: baseUrl + "/unsubscribe", body: {email: "johnsmith@gmail.com", categories: ["sports", "world"]}, json: true}, function(err, res, body) {
-      expect(res.statusCode).to.equal(200);
-      done();
-    });
+  	var subscription = {email: "johnsmith@gmail.com", categories: ["sports", "world"]};
+  	var unsubscription = {email: "johnsmith@gmail.com", categories: ["sports"]};
+    request.post({url: baseUrl + "/subscribe", body: subscription, json: true}, function(err, res, body) {
+    	expect(res.statusCode).to.equal(200);
+
+    	subscription.categories = ["world"];  // expect to remove 'sports'
+    	request.post({url: baseUrl + "/unsubscribe", body: unsubscription, json: true}, function(err, res, body) {
+	      expect(res.statusCode).to.equal(200);
+
+	      User.where(subscription).count(function(err, count) {
+	        expect(count).to.equal(1);
+
+	        request.post({url: baseUrl + "/reset"}, function(err, res, body) {
+	          expect(res.statusCode).to.equal(200);
+	          done();
+	        });
+	      });
+
+      });
+  	});
   });
 
-  it("ignores valid provided categories that the user is already unsubscribed from", function(done) {
-      request.post({url: baseUrl + "/unsubscribe", body: {email: "johnsmith@gmail.com", categories: ["sports", "world"]}, json: true}, function(err, res, body) {
-      expect(res.statusCode).to.equal(200);
-      done();
-    });
+  it("unsubscribes a user from all categories (explicitly provided)", function(done) {
+  	var subscription = {email: "johnsmith@gmail.com", categories: ['sports', 'world']};
+  	var unsubscription = {email: "johnsmith@gmail.com", categories: ['sports', 'world']};
+
+    request.post({url: baseUrl + "/subscribe", body: subscription, json: true}, function(err, res, body) {
+    	expect(res.statusCode).to.equal(200);
+
+    	request.post({url: baseUrl + "/unsubscribe", body: unsubscription, json: true}, function(err, res, body) {
+	      expect(res.statusCode).to.equal(200);
+
+	      User.where({email: subscription.email}).count(function(err, count) {
+	        expect(count).to.equal(0);
+	        done();
+	      });
+
+      });
+  	});
+  });
+
+  it("unsubscribes a user from all categories (not explicitly provided)", function(done) {
+  	var subscription = {email: "johnsmith@gmail.com", categories: ["sports", "world"]};
+    request.post({url: baseUrl + "/subscribe", body: subscription, json: true}, function(err, res, body) {
+    	expect(res.statusCode).to.equal(200);
+
+    	request.post({url: baseUrl + "/unsubscribe", body: {email: "johnsmith@gmail.com"}, json: true}, function(err, res, body) {
+	      expect(res.statusCode).to.equal(200);
+
+	      User.where({email: subscription.email}).count(function(err, count) {
+	        expect(count).to.equal(0);
+	        done();
+	      });
+
+      });
+  	});
+  });
+
+  it("ignores already unsubscribed categories", function(done) {
+  	var subscription = {email: "johnsmith@gmail.com", categories: ["technology"]};
+  	var unsubscription = {email: "johnsmith@gmail.com", categories: ["sports", "world"]};
+
+  	request.post({url: baseUrl + "/subscribe", body: subscription, json: true}, function(err, res, body) {
+  		expect(res.statusCode).to.equal(200);
+
+	    request.post({url: baseUrl + "/unsubscribe", body: unsubscription, json: true}, function(err, res, body) {
+	      expect(res.statusCode).to.equal(200);
+
+				User.where(subscription).count(function(err, count) {
+	        expect(count).to.equal(1);
+
+	        request.post({url: baseUrl + "/reset"}, function(err, res, body) {
+	          expect(res.statusCode).to.equal(200);
+	          done();
+	        });
+	      });
+
+	    });
+  	});
   });
 
   it("fails with invalid provided categories", function(done) {
-      request.post({url: baseUrl + "/unsubscribe", body: {email: "johnsmith@gmail.com", categories: ["invalid", "categories"]}, json: true}, function(err, res, body) {
-      expect(res.statusCode).to.equal(400);
-      done();
-    });
+  	var subscription = {email: "johnsmith@gmail.com", categories: ["sports", "world"]};
+    request.post({url: baseUrl + "/subscribe", body: subscription, json: true}, function(err, res, body) {
+    	expect(res.statusCode).to.equal(200);
+
+    	var unsubscription = subscription; unsubscription.categories = ["invalid", "categories"];
+    	request.post({url: baseUrl + "/unsubscribe", body: unsubscription, json: true}, function(err, res, body) {
+	      expect(res.statusCode).to.equal(400);
+
+        request.post({url: baseUrl + "/reset"}, function(err, res, body) {
+          expect(res.statusCode).to.equal(200);
+          done();
+        });
+      });
+
+  	});
   });
 
 });

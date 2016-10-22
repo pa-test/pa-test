@@ -3,7 +3,7 @@
 
 var mongoose = require('mongoose');
 
-var categoriesValidator = require("../validation/categories.js").categoriesValidator;
+var categoriesValidator = require("../validation/categories.js").categoriesValidator[0];
 var normaliseArray = require("../validation/categories.js").normaliseArray;
 
 var ArticleSchema = new mongoose.Schema({

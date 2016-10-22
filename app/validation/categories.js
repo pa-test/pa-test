@@ -9,10 +9,13 @@ exports.normaliseArray = function(input) {
   return input;
 }
 
-exports.categoriesValidator = {
+var allowedCategories = ["world", "politics", "technology", "culture", "business", "lifestyle", "sports"];
+exports.allowedCategories = allowedCategories;
+exports.categoriesValidator =
+[{
+  // do not allow empty array for subscription/upload calls
   validator: function(input) {
     if (input.length == 0) return false;
-    var allowedCategories = ["world", "politics", "technology", "culture", "business", "lifestyle", "sports"];
     for (var i = 0; i < input.length; i++) {
       if (allowedCategories.indexOf(input[i]) == -1) {
         return false;
@@ -21,4 +24,16 @@ exports.categoriesValidator = {
     return true;
   },
   message: "Invalid article categories provided"
-}
+},
+{
+  // allow empty array for unsubscription calls
+  validator: function(input) {
+    for (var i = 0; i < input.length; i++) {
+      if (allowedCategories.indexOf(input[i]) == -1) {
+        return false;
+      }
+    }
+    return true;
+  },
+  message: "Invalid article categories provided"
+}];
