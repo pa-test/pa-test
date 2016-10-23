@@ -28,8 +28,9 @@ app.post("/upload", function(req, res) {
           console.log(err);
           res.sendStatus(500);  // internal server error
         } else {
-					mailer.dispatch(req.body);  // send the article out to subscribers
-          res.sendStatus(200);
+					mailer.dispatch(req.body, function() {  // send the article out to subscribers
+						res.sendStatus(200);
+					});
         }
       });
     } else {
@@ -131,14 +132,22 @@ app.post("/unsubscribe", function(req, res) {
   }
 });
 
-// Remove all subscriptions (for testing purposes, **not for production**)
+// Remove database contents (for testing purposes, **not for production**)
 app.post("/reset", function(req, res) {
   User.remove({}, function(err) {
   	if (err) {
   		console.log(err);
   		res.sendStatus(500);
   	} else {
-  		res.sendStatus(200);
+			Article.remove({}, function(err) {
+				if (err) {
+					console.log(err);
+					res.sendStatus(500);
+				} else {
+					mailer.contacted = [];
+					res.sendStatus(200);
+				}
+			});
   	}
   });
 });

@@ -8,20 +8,33 @@ var mongoose = require('mongoose');
 
 var Article = require("../../app/schemas/article.js").Article;
 var User = require("../../app/schemas/user.js").User;
+var mailer = require("../../app/api/mailer.js");
 
 var newsApi = require("../../app/api/api.js");
 var baseUrl = "http://localhost:" + newsApi.server.address().port;
 
 exports.tests = describe("article upload endpoint", function() {
 
-  it("stores an article", function(done) {
+  it("stores an article and mails it to a subscriber", function(done) {
     fs.readFile('./test/upload/sample.json', 'utf8', function(err, data) {
       if (err) throw err;
       article = JSON.parse(data);
-      request.post({url: baseUrl + "/upload", body: article, json: true}, function(err, res, body) {
+
+      var subscription = {email: "johnsmith@gmail.com", categories: ["sports", "world"]};
+      request.post({url: baseUrl + "/subscribe", body: subscription, json: true}, function(err, res, body) {
         expect(res.statusCode).to.equal(200);
-        done();
+
+        request.post({url: baseUrl + "/upload", body: article, json: true}, function(err, res, body) {
+          expect(res.statusCode).to.equal(200);
+          expect(mailer.contacted).to.deep.equal([subscription.email]);
+
+          request.post({url: baseUrl + "/reset"}, function(err, res, body) {
+            expect(res.statusCode).to.equal(200);
+            done();
+          });
+        });
       });
+
     });
   });
 
