@@ -9,12 +9,15 @@ var mongoose = require('mongoose');
 var Article = require("../schemas/article.js").Article;
 var User = require("../schemas/user.js").User;
 var Unsubscription = require("../schemas/user.js").Unsubscription;
+var mailer = require("./mailer.js");
 
 var app = express();
 app.use(bodyParser.json());
 mongoose.connect('mongodb://localhost/news');
 
 // Set up REST API endpoints
+
+// Upload an article to the database
 app.post("/upload", function(req, res) {
   if (req.body) {
     var article = new Article(req.body);
@@ -23,8 +26,9 @@ app.post("/upload", function(req, res) {
       article.save(function(err) {
         if (err) {
           console.log(err);
-          res.sendStatus(400);
+          res.sendStatus(500);  // internal server error
         } else {
+					mailer.dispatch(req.body);  // send the article out to subscribers
           res.sendStatus(200);
         }
       });
@@ -36,6 +40,7 @@ app.post("/upload", function(req, res) {
   }
 });
 
+// Subscribe to selected article categories
 app.post("/subscribe", function(req, res) {
   if (req.body) {
   	var user = new User(req.body);
@@ -61,7 +66,7 @@ app.post("/subscribe", function(req, res) {
 
           if (newCategories.length > 0) {
             var updatedList = result.categories.concat(newCategories);
-            User.update({email: req.body.email}, {categories: updatedList}, function(err, raw) {
+            User.update({email: req.body.email}, {categories: updatedList}, function(err) {
               if (err) {
                 console.log(err);
                 res.sendStatus(500);
@@ -69,8 +74,8 @@ app.post("/subscribe", function(req, res) {
                 res.sendStatus(200);
               }
             });
-          } else {
-            res.sendStatus(200);  // do nothing if the request categories are identical
+          } else {  // do nothing if the request categories are identical
+            res.sendStatus(200);
           }
 
         }
@@ -82,6 +87,7 @@ app.post("/subscribe", function(req, res) {
   }
 });
 
+// Unsubscribe from selected article categories
 app.post("/unsubscribe", function(req, res) {
   if (req.body) {
     var unsubscription = new Unsubscription(req.body);
@@ -95,7 +101,7 @@ app.post("/unsubscribe", function(req, res) {
           res.sendStatus(400);
         } else {
           var updatedList = result.categories.filter(function(item) {
-            return unsubscription.categories.indexOf(item) == -1;  // remove the specified categories
+            return unsubscription.categories.indexOf(item) == -1;  // remove the specified categories from the list
           });
 
           if ((updatedList.length == 0) || (unsubscription.categories.length == 0)) {  // remove the user from the database
@@ -107,8 +113,8 @@ app.post("/unsubscribe", function(req, res) {
                 res.sendStatus(200);
               }
             });
-          } else {
-            User.update({email: req.body.email}, {categories: updatedList}, function(err, raw) {
+          } else {  // only remove the specified categories
+            User.update({email: req.body.email}, {categories: updatedList}, function(err) {
               if (err) {
                 console.log(err);
                 res.sendStatus(500);
@@ -125,6 +131,7 @@ app.post("/unsubscribe", function(req, res) {
   }
 });
 
+// Remove all subscriptions (for testing purposes, **not for production**)
 app.post("/reset", function(req, res) {
   User.remove({}, function(err) {
   	if (err) {
