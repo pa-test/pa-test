@@ -19,9 +19,10 @@ mongoose.connect('mongodb://localhost/news');
 
 // Upload an article to the database
 app.post("/upload", function(req, res) {
-  if (req.body) {
+  if (req.body) {  // check that a JSON body was sent with the request
     var article = new Article(req.body);
-    var invalidFormat = article.validateSync();
+    var invalidFormat = article.validateSync();  // validate against the article schema
+
     if (!invalidFormat) {
       article.save(function(err) {
         if (err) {
@@ -36,6 +37,7 @@ app.post("/upload", function(req, res) {
     } else {
       res.sendStatus(400);
     }
+
   } else {
     res.sendStatus(400);
   }
@@ -51,7 +53,7 @@ app.post("/subscribe", function(req, res) {
 			res.sendStatus(400);
 		} else {
       Subscription.findOne({'email': req.body.email}, 'categories', function(err, result) {
-        if (!result) {  // create a new entry if this user doesn't exist
+        if (!result) {  // create a new database entry if this user doesn't exist
           subscription.save(function(err) {
             if (err) {
               console.log(err);
@@ -75,7 +77,7 @@ app.post("/subscribe", function(req, res) {
                 res.sendStatus(200);
               }
             });
-          } else {  // do nothing if the request categories are identical
+          } else {  // do nothing if the requested categories are identical to the existing subscription
             res.sendStatus(200);
           }
 
@@ -102,11 +104,11 @@ app.post("/unsubscribe", function(req, res) {
           res.sendStatus(400);
         } else {
           var updatedList = result.categories.filter(function(item) {
-            return unsubscription.categories.indexOf(item) == -1;  // remove the specified categories from the list
+            return unsubscription.categories.indexOf(item) == -1;  // remove the requested categories from the list
           });
 
-          if ((updatedList.length == 0) || (unsubscription.categories.length == 0)) {  // remove the user from the database
-            Subscription.remove({}, function(err) {
+          if ((updatedList.length == 0) || (unsubscription.categories.length == 0)) {  // completely remove the user from the database
+            Subscription.remove({email: req.body.email}, function(err) {
               if (err) {
                 console.log(err);
                 res.sendStatus(500);
@@ -114,7 +116,7 @@ app.post("/unsubscribe", function(req, res) {
                 res.sendStatus(200);
               }
             });
-          } else {  // only remove the specified categories
+          } else {  // update database entry
             Subscription.update({email: req.body.email}, {categories: updatedList}, function(err) {
               if (err) {
                 console.log(err);
@@ -126,6 +128,7 @@ app.post("/unsubscribe", function(req, res) {
           }
         }
       });
+
     }
   } else {
     res.sendStatus(400);
@@ -144,7 +147,7 @@ app.post("/reset", function(req, res) {
 					console.log(err);
 					res.sendStatus(500);
 				} else {
-					mailer.contacted = [];
+					mailer.contacted = [];  // reset the running list of contacted subscribers
 					res.sendStatus(200);
 				}
 			});
@@ -157,5 +160,4 @@ var server = app.listen(process.env.PORT || 8080, function() {
 	var port = server.address().port;
 	console.log("App now running on port", port);
 });
-
 exports.server = server;

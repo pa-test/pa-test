@@ -16,5 +16,5 @@ var UnsubscriptionSchema = new mongoose.Schema({
   categories: {type: [String], set: normaliseArray, validate: categoriesValidator[1], required: false}
 });
 
-exports.Subscription = mongoose.model('User', SubscriptionSchema);
+exports.Subscription = mongoose.model('Subscription', SubscriptionSchema);
 exports.Unsubscription = mongoose.model('Unsubscription', UnsubscriptionSchema);

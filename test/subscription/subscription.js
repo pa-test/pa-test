@@ -37,7 +37,8 @@ exports.tests = describe("user subscription endpoint", function() {
         expect(res.statusCode).to.equal(200);
 
         Subscription.where(subscription).count(function(err, count) {
-          expect(count).to.equal(1);
+          expect(count).to.equal(1);  // expect only one entry with this subscription
+
           request.post({url: baseUrl + "/reset"}, function(err, res, body) {
             expect(res.statusCode).to.equal(200);
             done();

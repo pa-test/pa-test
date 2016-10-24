@@ -3,7 +3,6 @@
 
 var request = require('request');
 var expect = require("chai").expect;
-var fs = require('fs');
 var mongoose = require('mongoose');
 
 var Article = require("../../app/schemas/article.js").Article;
@@ -17,11 +16,14 @@ exports.tests = describe ("subscription reset endpoint", function() {
     request.post({url: baseUrl + "/reset"}, function(err, res, body) {
     expect(res.statusCode).to.equal(200);
 
-      Subscription.where({}).count(function(err, count) {
+      Subscription.where({}).count(function(err, count) {  // check subscriptions are empty
         expect(count).to.equal(0);
 
+        Article.where({}).count(function(err, count) {  // check articles are empty
+          expect(count).to.equal(0);
+          done();
+        });
 
-        done();
       });
     });
   });

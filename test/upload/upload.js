@@ -13,7 +13,7 @@ var baseUrl = "http://localhost:" + newsApi.server.address().port;
 exports.tests = describe("article upload endpoint", function() {
 
   it("stores an article and mails it to a subscriber", function(done) {
-    fs.readFile('./test/upload/sample.json', 'utf8', function(err, data) {
+    fs.readFile('./test/upload/sample.json', 'utf8', function(err, data) {  // read in sample JSON file
       if (err) throw err;
       article = JSON.parse(data);
 
@@ -23,7 +23,7 @@ exports.tests = describe("article upload endpoint", function() {
 
         request.post({url: baseUrl + "/upload", body: article, json: true}, function(err, res, body) {
           expect(res.statusCode).to.equal(200);
-          expect(mailer.contacted).to.deep.equal([subscription.email]);
+          expect(mailer.contacted).to.deep.equal([subscription.email]);  // check that the email dispatch stub was called
 
           request.post({url: baseUrl + "/reset"}, function(err, res, body) {
             expect(res.statusCode).to.equal(200);
@@ -52,7 +52,7 @@ exports.tests = describe("article upload endpoint", function() {
       if (err) throw err;
       article = JSON.parse(data);
       for (var i = 0; i < article.categories.length; i++) {
-        article.categories[i] = "  " + article.categories[i].toUpperCase() + "  ";
+        article.categories[i] = "  " + article.categories[i].toUpperCase() + "  ";  // add some whitespace and change case
       }
       request.post({url: baseUrl + "/upload", body: article, json: true}, function(err, res, body) {
         expect(res.statusCode).to.equal(200);

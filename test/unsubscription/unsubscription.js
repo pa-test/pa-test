@@ -15,10 +15,11 @@ exports.tests = describe("user unsubscription endpoint", function() {
   it("unsubscribes a user from provided categories", function(done) {
   	var subscription = {email: "johnsmith@gmail.com", categories: ["sports", "world"]};
   	var unsubscription = {email: "johnsmith@gmail.com", categories: ["sports"]};
+		
     request.post({url: baseUrl + "/subscribe", body: subscription, json: true}, function(err, res, body) {
     	expect(res.statusCode).to.equal(200);
 
-    	subscription.categories = ["world"];  // expect to remove 'sports'
+    	subscription.categories = ["world"];  // expect 'sports' to be removed, leaving only 'world'
     	request.post({url: baseUrl + "/unsubscribe", body: unsubscription, json: true}, function(err, res, body) {
 	      expect(res.statusCode).to.equal(200);
 
@@ -46,7 +47,7 @@ exports.tests = describe("user unsubscription endpoint", function() {
 	      expect(res.statusCode).to.equal(200);
 
 	      Subscription.where({email: subscription.email}).count(function(err, count) {
-	        expect(count).to.equal(0);
+	        expect(count).to.equal(0);  // the user should now be completely removed from the database
 	        done();
 	      });
 
