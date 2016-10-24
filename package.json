@@ -7,7 +7,7 @@
     "test": "./node_modules/.bin/mocha --reporter spec"
   },
   "author": "Stuart Phillips",
-  "homepage": "https://github.com/stuart-xyz/pa-test#readme",
+  "homepage": "https://github.com/pa-test/pa-test#readme",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.15.2",
