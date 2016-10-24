@@ -9,7 +9,7 @@
 ## Install
 
 1. Install Node and MongoDB
-2. `git clone https://github.com/stuart-xyz/pa-test`
+2. `git clone https://github.com/pa-test/pa-test`
 3. Start a MongoDB server on `localhost`
 4. `npm test`
 5. `node ./app/api/api.js`
