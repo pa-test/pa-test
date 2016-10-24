@@ -6,10 +6,7 @@ var expect = require("chai").expect;
 var fs = require('fs');
 var mongoose = require('mongoose');
 
-var Article = require("../../app/schemas/article.js").Article;
-var User = require("../../app/schemas/user.js").User;
 var mailer = require("../../app/api/mailer.js");
-
 var newsApi = require("../../app/api/api.js");
 var baseUrl = "http://localhost:" + newsApi.server.address().port;
 

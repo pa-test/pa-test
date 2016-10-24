@@ -7,8 +7,8 @@ var request = require('request');
 var mongoose = require('mongoose');
 
 var Article = require("../schemas/article.js").Article;
-var User = require("../schemas/user.js").User;
-var Unsubscription = require("../schemas/user.js").Unsubscription;
+var Subscription = require("../schemas/subscription.js").Subscription;
+var Unsubscription = require("../schemas/subscription.js").Unsubscription;
 var mailer = require("./mailer.js");
 
 var app = express();
@@ -44,15 +44,15 @@ app.post("/upload", function(req, res) {
 // Subscribe to selected article categories
 app.post("/subscribe", function(req, res) {
   if (req.body) {
-  	var user = new User(req.body);
-		var invalidFormat = user.validateSync();
+  	var subscription = new Subscription(req.body);
+		var invalidFormat = subscription.validateSync();
 
 		if (invalidFormat) {
 			res.sendStatus(400);
 		} else {
-      User.findOne({'email': req.body.email}, 'categories', function(err, result) {
+      Subscription.findOne({'email': req.body.email}, 'categories', function(err, result) {
         if (!result) {  // create a new entry if this user doesn't exist
-          user.save(function(err) {
+          subscription.save(function(err) {
             if (err) {
               console.log(err);
               res.sendStatus(500);  // internal server error
@@ -61,13 +61,13 @@ app.post("/subscribe", function(req, res) {
             }
           });
         } else {  // update subscription for existing user
-          var newCategories = user.categories.filter(function(item) {
+          var newCategories = subscription.categories.filter(function(item) {
             return result.categories.indexOf(item) == -1;
           });
 
           if (newCategories.length > 0) {
             var updatedList = result.categories.concat(newCategories);
-            User.update({email: req.body.email}, {categories: updatedList}, function(err) {
+            Subscription.update({email: req.body.email}, {categories: updatedList}, function(err) {
               if (err) {
                 console.log(err);
                 res.sendStatus(500);
@@ -97,7 +97,7 @@ app.post("/unsubscribe", function(req, res) {
     if (invalidFormat) {
       res.sendStatus(400);
     } else {
-      User.findOne({email: req.body.email}, 'categories', function(err, result) {
+      Subscription.findOne({email: req.body.email}, 'categories', function(err, result) {
         if (!result) {  // email address cannot be found
           res.sendStatus(400);
         } else {
@@ -106,7 +106,7 @@ app.post("/unsubscribe", function(req, res) {
           });
 
           if ((updatedList.length == 0) || (unsubscription.categories.length == 0)) {  // remove the user from the database
-            User.remove({}, function(err) {
+            Subscription.remove({}, function(err) {
               if (err) {
                 console.log(err);
                 res.sendStatus(500);
@@ -115,7 +115,7 @@ app.post("/unsubscribe", function(req, res) {
               }
             });
           } else {  // only remove the specified categories
-            User.update({email: req.body.email}, {categories: updatedList}, function(err) {
+            Subscription.update({email: req.body.email}, {categories: updatedList}, function(err) {
               if (err) {
                 console.log(err);
                 res.sendStatus(500);
@@ -134,7 +134,7 @@ app.post("/unsubscribe", function(req, res) {
 
 // Remove database contents (for testing purposes, **not for production**)
 app.post("/reset", function(req, res) {
-  User.remove({}, function(err) {
+  Subscription.remove({}, function(err) {
   	if (err) {
   		console.log(err);
   		res.sendStatus(500);

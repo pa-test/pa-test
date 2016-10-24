@@ -6,9 +6,7 @@ var expect = require("chai").expect;
 var fs = require('fs');
 var mongoose = require('mongoose');
 
-var Article = require("../../app/schemas/article.js").Article;
-var User = require("../../app/schemas/user.js").User;
-
+var Subscription = require("../../app/schemas/subscription.js").Subscription;
 var newsApi = require("../../app/api/api.js");
 var baseUrl = "http://localhost:" + newsApi.server.address().port;
 
@@ -19,7 +17,7 @@ exports.tests = describe("user subscription endpoint", function() {
     request.post({url: baseUrl + "/subscribe", body: subscription, json: true}, function(err, res, body) {
       expect(res.statusCode).to.equal(200);
 
-      User.where(subscription).count(function(err, count) {
+      Subscription.where(subscription).count(function(err, count) {
         expect(count).to.equal(1);
 
         request.post({url: baseUrl + "/reset"}, function(err, res, body) {
@@ -38,7 +36,7 @@ exports.tests = describe("user subscription endpoint", function() {
       request.post({url: baseUrl + "/subscribe", body: subscription, json: true}, function(err, res, body) {
         expect(res.statusCode).to.equal(200);
 
-        User.where(subscription).count(function(err, count) {
+        Subscription.where(subscription).count(function(err, count) {
           expect(count).to.equal(1);
           request.post({url: baseUrl + "/reset"}, function(err, res, body) {
             expect(res.statusCode).to.equal(200);
@@ -58,7 +56,7 @@ exports.tests = describe("user subscription endpoint", function() {
       request.post({url: baseUrl + "/subscribe", body: subscription, json: true}, function(err, res, body) {
         expect(res.statusCode).to.equal(200);
 
-        User.find({email: subscription.email}, 'categories', function(err, result) {
+        Subscription.find({email: subscription.email}, 'categories', function(err, result) {
           expect(result.length).to.equal(1);  // check that the email hasn't been duplicated
           expect(result[0].categories == subscription.categories);  // check that the categories updated correctly
 
