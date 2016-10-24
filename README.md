@@ -1,18 +1,19 @@
 # Press Association technical test
 
-[![CircleCI](https://circleci.com/gh/pa-test/pa-test/tree/master.svg?style=shield&circle-token=26dd2415adee2f563094d2c989386cf184319c53)](https://circleci.com/gh/pa-test/pa-test)<br>
+[![CircleCI](https://circleci.com/gh/pa-test/pa-test/tree/master.svg?style=shield&circle-token=26dd2415adee2f563094d2c989386cf184319c53)](https://circleci.com/gh/pa-test/pa-test/tree/master)<br>
 (master)
 
-[![CircleCI](https://circleci.com/gh/pa-test/pa-test/tree/develop.svg?style=shield&circle-token=26dd2415adee2f563094d2c989386cf184319c53)](https://circleci.com/gh/stuart-xyz/pa-test/tree/develop)<br>
+[![CircleCI](https://circleci.com/gh/pa-test/pa-test/tree/develop.svg?style=shield&circle-token=26dd2415adee2f563094d2c989386cf184319c53)](https://circleci.com/gh/pa-test/pa-test/tree/develop)<br>
 (develop)
 
 ## Install
 
 1. Install Node and MongoDB
 2. `git clone https://github.com/pa-test/pa-test`
-3. Start a MongoDB server on `localhost`
-4. `npm test`
-5. `node ./app/api/api.js`
+3. `npm install`
+4. Start a MongoDB server on `localhost`
+5. `npm test`
+6. `node ./app/api/api.js`
 
 Notes: default server address, port is `localhost`, `8080`; see commit list for CircleCI test history
 
